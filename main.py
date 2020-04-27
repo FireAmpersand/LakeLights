@@ -101,7 +101,7 @@ def modifyThread (name, command):
 def main():
     #Main function
     initialSetup()
-
+    iLED.runStartup()
     #If new threads need to be started, start them
     if CURRENT_INSIDE_POWERED_STATE == 'ON':
         modifyThread('Internal', 'start')

@@ -15,7 +15,7 @@ STRIP = Adafruit_NeoPixel(STRIP_LEDS, STRIP_PIN, STRIP_FREQ, STRIP_DMA, STRIP_IN
 STRIP.begin()
 
 #Master loop varible to keep patterns running
-MASTER_LOOP = False
+MASTER_LOOP = True
 
 
 def newBrightness():
