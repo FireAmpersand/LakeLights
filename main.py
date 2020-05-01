@@ -2,7 +2,7 @@ import time
 import threading
 import mysql.connector
 import python.internalLEDs as iLED #Import Inside Class
-#import python.externalLEDs as eLED #Import Outside Class
+import python.externalLEDs as eLED #Import Outside Class
 
 #Global Vars
 CURRENT_INSIDE_PATTERN = "N/A"
