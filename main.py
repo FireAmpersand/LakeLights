@@ -15,10 +15,9 @@ EXTERNAL_THREAD = ""
 def callSQL(name):
 
     mydb = mysql.connector.connect(
-      host="bumblebee.fireampersand.ca",
-      port="10069",
+      host="192.168.0.251",
       user="root",
-      passwd="tester",
+      passwd="PassmorePassword",
       database="lakerpidb"
     )
 
@@ -99,9 +98,11 @@ def modifyThread (name, command):
             EXTERNAL_THREAD.terminate()
 
 def main():
+    global CURRENT_INSIDE_POWERED_STATE
+    global CURRENT_OUTSIDE_POWERED_STATE
     #Main function
     initialSetup()
-    iLED.runStartup()
+    iLED.startUp()
     #If new threads need to be started, start them
     if CURRENT_INSIDE_POWERED_STATE == 'ON':
         modifyThread('Internal', 'start')
@@ -111,13 +112,14 @@ def main():
     #Main Loop
     while True:
         time.sleep(5)
+        print(INTERNAL_THREAD)
         print(CURRENT_INSIDE_PATTERN + " | " + callSQL('Internal')[0][2])
         print(needsUpdate('Internal'))
         #Internal Checks
         if needsUpdate('Internal') == True:
             #Stop the old thread if it is running
-            if INTERNAL_THREAD.is_alive() == True:
-                modifyThread('Internal', kill)
+            #if INTERNAL_THREAD.is_alive() == True:
+               #modifyThread('Internal', kill)
             #Update the new values
             setState('Internal', callSQL('Internal'))
 
