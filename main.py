@@ -9,8 +9,8 @@ CURRENT_INSIDE_PATTERN = "N/A"
 CURRENT_OUTSIDE_PATTERN = "N/A"
 CURRENT_INSIDE_POWERED_STATE = "N/A"
 CURRENT_OUTSIDE_POWERED_STATE = "N/A"
-INTERNAL_THREAD = ""
-EXTERNAL_THREAD = ""
+INTERNAL_THREAD = None
+EXTERNAL_THREAD = None
 
 def callSQL(name):
 
@@ -77,6 +77,14 @@ def startPattern(name, pattern):
         iLED.runTheater() 
     elif name == 'External' and pattern == 'TheaterChase':
         eLED.runTheater()
+    elif name == 'Internal' and pattern == 'StaticWhite':
+        iLED.staticColor(255,255,255)
+    elif name == 'External' and pattern == 'StaticWhite':
+        eLED.staticColor(255,255,255)
+    elif name == 'Internal' and pattern == 'ColorCycle':
+        iLED.runColorCycle()
+    elif name == 'Internal':
+        iLED.runError()
 
 def modifyThread (name, command):
     #Change the state of a thread either kill or start
@@ -84,18 +92,24 @@ def modifyThread (name, command):
     global EXTERNAL_THREAD
     if name == 'Internal':
         if command == 'start':
+            iLED.MASTER_LOOP = True
             INTERNAL_THREAD = threading.Thread(target=startPattern, args=(name,CURRENT_INSIDE_PATTERN))
             INTERNAL_THREAD.daemon = True
             INTERNAL_THREAD.start()
         elif command == 'kill':
-            INTERNAL_THREAD.terminate()
+            iLED.MASTER_LOOP = False
+            INTERNAL_THREAD.join()
+            iLED.turnOff()
     elif name == 'External':
         if command == 'start':
+            eLED.MASTER_LOOP = True
             EXTERNAL_THREAD = threading.Thread(target=startPattern, args=(name,CURRENT_OUTSIDE_PATTERN))
             EXTERNAL_THREAD.daemon = True
             EXTERNAL_THREAD.start()
         elif command == 'kill':
-            EXTERNAL_THREAD.terminate()
+            eLED.MASTER_LOOP = False
+            EXTERNAL_THREAD.join()
+            eLED.turnOff()
 
 def main():
     global CURRENT_INSIDE_POWERED_STATE
@@ -112,26 +126,25 @@ def main():
     #Main Loop
     while True:
         time.sleep(5)
-        print(INTERNAL_THREAD)
-        print(CURRENT_INSIDE_PATTERN + " | " + callSQL('Internal')[0][2])
-        print(needsUpdate('Internal'))
         #Internal Checks
         if needsUpdate('Internal') == True:
             #Stop the old thread if it is running
-            #if INTERNAL_THREAD.is_alive() == True:
-               #modifyThread('Internal', kill)
+            if (not(INTERNAL_THREAD is None)):
+               if INTERNAL_THREAD.is_alive() == True:
+                  modifyThread('Internal', 'kill')
             #Update the new values
             setState('Internal', callSQL('Internal'))
 
             #If the new values are on, then start a new thread
-            if CURRENT_INTERNAL_POWERED_STATE == 'ON':
+            if CURRENT_INSIDE_POWERED_STATE == 'ON':
                 modifyThread('Internal', 'start')
 
         #External Checks
         if needsUpdate('External') == True:
             #Stop the old thread if it is running
-            if EXTERNAL_THREAD.is_alive() == True:
-                modifyThread('External', 'kill')
+            if (not(EXTERNAL_THREAD is None)):
+                if EXTERNAL_THREAD.is_alive() == True:
+                    modifyThread('External', 'kill')
             #Update new values
             setState('External', callSQL('External'))
 

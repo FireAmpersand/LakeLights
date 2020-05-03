@@ -16,7 +16,7 @@ STRIP = Adafruit_NeoPixel(STRIP_LEDS, STRIP_PIN, STRIP_FREQ, STRIP_DMA, STRIP_IN
 STRIP.begin()
 
 
-MASTER_LOOP = True
+MASTER_LOOP = False
 MOVIE_LIGHT = True
 MOVIE_LIGHT_RANGE = 540
 
@@ -237,3 +237,9 @@ def pong():
 def runCanadaDayAnimation():
     while MASTER_LOOP:
         specialTheaterChase()
+
+
+def runError():
+    while MASTER_LOOP:
+        pulseColor(Color(255,0,0))
+        time.sleep(1)
