@@ -242,4 +242,4 @@ def runCanadaDayAnimation():
 def runError():
     while MASTER_LOOP:
         pulseColor(Color(255,0,0))
-        time.sleep(1)
+        time.sleep(0.5)

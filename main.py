@@ -13,23 +13,26 @@ INTERNAL_THREAD = None
 EXTERNAL_THREAD = None
 
 def callSQL(name):
+    try:
+       mydb = mysql.connector.connect(
+         host="192.168.0.251",
+         user="root",
+         passwd="PassmorePassword",
+         database="lakerpidb"
+       )
 
-    mydb = mysql.connector.connect(
-      host="192.168.0.251",
-      user="root",
-      passwd="PassmorePassword",
-      database="lakerpidb"
-    )
+       #Does a call to the sql server for name.
+       if name == "Internal":
+           mycursor = mydb.cursor()
+           mycursor.execute("SELECT * FROM states WHERE Name='Internal'")
+           return mycursor.fetchall()
+       elif name == 'External':
+           mycursor = mydb.cursor()
+           mycursor.execute("SELECT * FROM states WHERE Name='External'")
+           return mycursor.fetchall()
 
-    #Does a call to the sql server for name.
-    if name == "Internal":
-        mycursor = mydb.cursor()
-        mycursor.execute("SELECT * FROM states WHERE Name='Internal'")
-        return mycursor.fetchall()
-    elif name == 'External':
-        mycursor = mydb.cursor()
-        mycursor.execute("SELECT * FROM states WHERE Name='External'")
-        return mycursor.fetchall()
+    except:
+        return [0,0,0]
 
 def setState(name, result):
     #Sets the state of the name strip with the sql result.
@@ -132,6 +135,8 @@ def main():
             if (not(INTERNAL_THREAD is None)):
                if INTERNAL_THREAD.is_alive() == True:
                   modifyThread('Internal', 'kill')
+               else:
+                  iLED.turnOff()
             #Update the new values
             setState('Internal', callSQL('Internal'))
 
@@ -145,6 +150,8 @@ def main():
             if (not(EXTERNAL_THREAD is None)):
                 if EXTERNAL_THREAD.is_alive() == True:
                     modifyThread('External', 'kill')
+                else:
+                   eLED.turnOff()
             #Update new values
             setState('External', callSQL('External'))
 
